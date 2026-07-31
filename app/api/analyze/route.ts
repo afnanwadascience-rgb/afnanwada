@@ -35,7 +35,18 @@ Category: ${category}
 Script:
 ${script}
 
-Return ONLY valid JSON in this format:
+Return ONLY valid JSON.
+
+Requirements:
+- Generate exactly 6 unique hooks.
+- Generate exactly 3 unique titles.
+- Base every result ONLY on the provided script.
+- Never reuse generic hooks.
+- Detect the script language automatically.
+- If the script is Bengali, return everything in Bengali.
+- If the script is English, return everything in English.
+
+Return this JSON schema:
 
 {
   "hooks": [
@@ -83,6 +94,13 @@ console.log("AI response:");
 console.log(response.output_text);
 const text = response.output_text;
 
+if (!text) {
+  return NextResponse.json(
+    { error: "The AI returned an empty response." },
+    { status: 500 }
+  );
+}
+
 console.log("Raw AI response:");
 console.log(text);
 
@@ -100,4 +118,23 @@ try {
     },
     { status: 500 }
   );
+}
+
+return NextResponse.json(
+  {
+    success: true,
+    data: analysisResult,
+  },
+  { status: 200 }
+);
+} catch (error) {
+  console.error(error);
+
+  return NextResponse.json(
+    {
+      error: "Failed to process script analysis.",
+    },
+    { status: 500 }
+  );
+}
 }

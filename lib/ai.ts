@@ -12,48 +12,98 @@ export interface AnalysisResponse {
   seoDescription: string;
 }
 
-/**
- * Sends script payload to AI Provider (e.g. OpenAI GPT-4o or Anthropic Claude)
- * and formats the JSON output into structured platform metrics.
- */
-export async function analyzeScriptWithAI(data: AnalysisRequest): Promise<AnalysisResponse> {
+export async function analyzeScriptWithAI(
+  data: AnalysisRequest
+): Promise<AnalysisResponse> {
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
-    // Fallback Mock Engine for testing environments without API Key
-    return {
-      overallScore: 91,
-      hooks: [
-        { style: 'Curiosity', text: 'Most creators make this $5,000 mistake before clicking record...', rationale: 'High loss aversion.' },
-        { style: 'Story', text: 'Three months ago my channel was dead. Here is what changed everything.', rationale: 'Narrative transformation.' },
-      ],
-      titles: [
-        { title: 'I Fixed My YouTube Script Mechanics (And Doubled Retention)', ctrScore: 94 },
-        { title: 'Why 99% of YouTube Scripts Fail in 30 Seconds', ctrScore: 91 },
-      ],
-      retentionAlerts: [
-        { timestamp: '0:25 - 0:45', issue: 'Context drags before presenting the problem.', suggestion: 'Cut lines 12–16 or add dynamic B-roll.' }
-      ],
-      seoDescription: 'Optimized YouTube video description with timestamps and target keywords.'
-    };
+    throw new Error("OPENAI_API_KEY is missing");
   }
 
-  // Production API Fetch implementation
-  const prompt = `Analyze this YouTube script for category "${data.category}":\n\n${data.script}`;
+  const prompt = `
+You are an expert YouTube script analyst.
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o',
-      messages: [{ role: 'user', content: prompt }],
-      response_format: { type: 'json_object' },
-    }),
-  });
+Analyze the following script carefully.
 
-  const raw = await response.json();
-  return JSON.parse(raw.choices[0].message.content);
+Category:
+${data.category}
+
+Script:
+${data.script}
+
+Return ONLY valid JSON.
+
+Requirements:
+- Create titles specifically based on this script.
+- Create hooks that match the actual topic.
+- Do not reuse generic examples.
+- Analyze retention problems from this exact script.
+- Make SEO description related to this script.
+
+JSON format:
+
+{
+  "overallScore": number,
+  "hooks": [
+    {
+      "style": "string",
+      "text": "string",
+      "rationale": "string"
+    }
+  ],
+  "titles": [
+    {
+      "title": "string",
+      "ctrScore": number
+    }
+  ],
+  "retentionAlerts": [
+    {
+      "timestamp": "string",
+      "issue": "string",
+      "suggestion": "string"
+    }
+  ],
+  "seoDescription": "string"
+}
+`;
+
+  const response = await fetch(
+    "https://api.openai.com/v1/chat/completions",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-5-mini",
+        temperature: 0.8,
+        messages: [
+          {
+            role: "system",
+            content:
+              "You analyze YouTube scripts and generate unique creator-focused insights.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        response_format: {
+          type: "json_object",
+        },
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`OpenAI API Error: ${errorText}`);
+  }
+
+  const result = await response.json();
+
+  return JSON.parse(result.choices[0].message.content);
 }

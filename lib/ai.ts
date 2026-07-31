@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import OpenAI from "openai";
 
 export interface AnalysisRequest {
   script: string;
@@ -25,109 +25,95 @@ export interface AnalysisResponse {
   seoDescription: string;
 }
 
+const client = new OpenAI({
+  apiKey: process.env.GROQ_API_KEY,
+  baseURL: "https://api.groq.com/openai/v1",
+});
 
 export async function analyzeScriptWithAI(
   data: AnalysisRequest
 ): Promise<AnalysisResponse> {
-
-  console.log("REAL GEMINI FUNCTION CALLED");
-  console.log("SCRIPT:", data.script.substring(0, 100));
-
-
-  const apiKey = process.env.GEMINI_API_KEY;
-
-  if (!apiKey) {
-    throw new Error("GEMINI_API_KEY is missing");
+  if (!process.env.GROQ_API_KEY) {
+    throw new Error("GROQ_API_KEY is missing");
   }
 
-
-  const genAI = new GoogleGenerativeAI(apiKey);
-
-  const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash",
-    generationConfig: {
-      temperature: 0.8,
-      responseMimeType: "application/json",
-    },
-  });
-
+  if (!data.script.trim()) {
+    throw new Error("Script is required.");
+  }
 
   const prompt = `
-You are an expert YouTube script analyst.
+You are an elite YouTube strategist.
 
-Analyze this exact script.
+Analyze ONLY the following script.
 
 Category:
 ${data.category}
 
-Target duration:
-${data.targetDurationSeconds || "unknown"} seconds
+Target Duration:
+${data.targetDurationSeconds ?? "Unknown"} seconds
 
-Script:
+SCRIPT:
 """
 ${data.script}
 """
 
 Return ONLY valid JSON.
 
-Rules:
-- Titles must be based on this exact script.
-- Hooks must match the actual topic.
-- Do not use generic examples.
-- Find real retention problems.
-- Make SEO description related to the script.
-
-
-JSON format:
-
 {
-  "overallScore": number,
-
-  "hooks": [
+  "overallScore": 0,
+  "hooks":[
     {
-      "style": "string",
-      "text": "string",
-      "rationale": "string"
+      "style":"",
+      "text":"",
+      "rationale":""
     }
   ],
-
-  "titles": [
+  "titles":[
     {
-      "title": "string",
-      "ctrScore": number
+      "title":"",
+      "ctrScore":0
     }
   ],
-
-  "retentionAlerts": [
+  "retentionAlerts":[
     {
-      "timestamp": "string",
-      "issue": "string",
-      "suggestion": "string"
+      "timestamp":"",
+      "issue":"",
+      "suggestion":""
     }
   ],
-
-  "seoDescription": "string"
+  "seoDescription":""
 }
 `;
 
+  const completion = await client.chat.completions.create({
+    model: "llama-3.3-70b-versatile",
+    temperature: 0.6,
+    response_format: {
+      type: "json_object",
+    },
+    messages: [
+      {
+        role: "system",
+        content:
+          "Return only valid JSON. Never use markdown or explanations.",
+      },
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
+  });
 
-  const result = await model.generateContent(prompt);
+  const content = completion.choices[0]?.message?.content;
 
-
-  let responseText = result.response.text();
-
-
-  // Remove markdown if Gemini adds it
-  responseText = responseText
-    .replace(/```json/g, "")
-    .replace(/```/g, "")
-    .trim();
-
+  if (!content) {
+    throw new Error("Groq returned an empty response.");
+  }
 
   try {
-    return JSON.parse(responseText);
-  } catch (error) {
-    console.error("Gemini returned invalid JSON:", responseText);
-    throw new Error("Gemini response was not valid JSON");
+    return JSON.parse(content) as AnalysisResponse;
+  } catch {
+    console.error("Invalid JSON:", content);
+    throw new Error("Groq returned invalid JSON.");
   }
 }

@@ -1,140 +1,96 @@
+import { NextResponse } from "next/server";
 import OpenAI from "openai";
-import { NextRequest, NextResponse } from "next/server";
 
-const client = new OpenAI({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function POST(req: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const body = await req.json();
-    const { script, category = "Educational" } = body;
-    console.log("Received script:");
-    console.log(script);
+    const body = await request.json();
+    const { script, category = "General" } = body;
 
-    if (!script || typeof script !== "string" || script.trim().length < 20) {
+    if (!script || !script.trim()) {
       return NextResponse.json(
-        {
-          error:
-            "Script content is required and must be at least 20 characters long.",
-        },
+        { success: false, error: "Script text is required for analysis." },
         { status: 400 }
       );
     }
 
-    const response = await client.responses.create({
-
-      model: "gpt-5.5",
-      input: `
-You are an expert YouTube Script Analyzer.
-
-Analyze ONLY the script below.
-
-Category: ${category}
-
-Script:
-${script}
-
-Return ONLY valid JSON.
-
-Requirements:
-- Generate exactly 6 unique hooks.
-- Generate exactly 3 unique titles.
-- Base every result ONLY on the provided script.
-- Never reuse generic hooks.
-- Detect the script language automatically.
-- If the script is Bengali, return everything in Bengali.
-- If the script is English, return everything in English.
-
-Return this JSON schema:
-
+    const prompt = `
+You are an expert YouTube growth strategist and script optimization AI. Analyze the following video script under the category "${category}".
+You MUST return ONLY valid JSON matching this exact structure, with no markdown code block formatting or extra text outside the JSON object:
 {
+  "viralScore": 85,
   "hooks": [
     {
-      "style": "",
-      "text": "",
-      "rationale": ""
+      "style": "Curiosity Gap",
+      "text": "Compelling hook text here...",
+      "rationale": "Explanation why this hook works..."
     }
   ],
   "titles": [
     {
-      "title": "",
-      "ctrScore": 0,
-      "seoScore": 0,
-      "readabilityScore": 0
+      "title": "Optimized Title Here",
+      "ctrScore": 92,
+      "seoScore": 88,
+      "readabilityScore": 95
     }
   ],
   "thumbnailConcepts": {
-    "textIdeas": [],
-    "concept": "",
-    "colorPalette": [],
-    "emotionalFocus": ""
+    "textIdeas": ["Idea 1", "Idea 2"],
+    "concept": "Detailed visual description of thumbnail...",
+    "colorPalette": ["#ff0000", "#000000"],
+    "emotionalFocus": "Curiosity & Urgency"
   },
   "retentionAnalysis": {
-    "slowIntros": [],
-    "weakTransitions": [],
-    "patternInterrupts": []
+    "slowIntros": ["Point 1 about slow intros..."],
+    "weakTransitions": ["Point 1 about weak transitions..."],
+    "patternInterrupts": ["Point 1 about pattern interrupts..."]
   },
   "seoDescription": {
-    "fullText": "",
-    "keywords": [],
-    "hashtags": []
+    "fullText": "Full optimized YouTube description...",
+    "keywords": ["keyword1", "keyword2"],
+    "hashtags": ["hashtag1", "hashtag2"]
   }
 }
 
-Detect the language automatically.
-If the script is Bengali, answer in Bengali.
-If English, answer in English.
-Do not include markdown.
-Do not include explanations.
-Return JSON only.
-`,
+Script to analyze:
+"""
+${script}
+"""
+`;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" },
     });
-console.log("AI response:");
-console.log(response.output_text);
-const text = response.output_text;
 
-if (!text) {
-  return NextResponse.json(
-    { error: "The AI returned an empty response." },
-    { status: 500 }
-  );
-}
+    const responseText = response.choices[0]?.message?.content || "{}";
 
-console.log("Raw AI response:");
-console.log(text);
+    console.log("========== RAW AI RESPONSE ==========");
+    console.log(responseText);
+    console.log("====================================");
 
-let analysisResult;
+    let parsedData;
+    try {
+      parsedData = JSON.parse(responseText);
+    } catch (parseError) {
+      // Robust fallback cleanup if markdown code blocks were included
+      const cleaned = responseText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+      parsedData = JSON.parse(cleaned);
+    }
 
-try {
-  analysisResult = JSON.parse(text);
-} catch (e) {
-  console.error("Failed to parse AI response:", text);
-
-  return NextResponse.json(
-    {
-      error: "The AI returned an invalid JSON response.",
-      raw: text,
-    },
-    { status: 500 }
-  );
-}
-
-return NextResponse.json(
-  {
-    success: true,
-    data: analysisResult,
-  },
-  { status: 200 }
-);
-} catch (error) {
-  console.error(error);
-
-  return NextResponse.json(
-    {
-      error: "Failed to process script analysis.",
-    },
-    { status: 500 }
-  );
-}
+    return NextResponse.json({
+      success: true,
+      data: parsedData,
+    });
+  } catch (error: any) {
+    console.error("API Analyze Error:", error);
+    return NextResponse.json(
+      { success: false, error: error.message || "Failed to generate AI analysis" },
+      { status: 500 }
+    );
+  }
 }

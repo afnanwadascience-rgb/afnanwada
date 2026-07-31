@@ -16,7 +16,8 @@ export async function analyzeScriptWithAI(
   data: AnalysisRequest
 ): Promise<AnalysisResponse> {
   const apiKey = process.env.OPENAI_API_KEY;
-
+console.log("REAL AI FUNCTION CALLED");
+console.log("SCRIPT:", data.script.substring(0, 100));
   if (!apiKey) {
     throw new Error("OPENAI_API_KEY is missing");
   }

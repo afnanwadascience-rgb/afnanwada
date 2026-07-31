@@ -2,36 +2,52 @@ import { AnalysisRequest, AnalysisResponse } from '@/lib/ai';
 
 export class AIService {
   /**
-   * Calls the real OpenAI API through Next.js API route.
+   * Calls the real AI analyzer API route.
    */
-  static async analyzeScript(payload: AnalysisRequest): Promise<AnalysisResponse> {
+  static async analyzeScript(
+    payload: AnalysisRequest
+  ): Promise<AnalysisResponse> {
     try {
-      const response = await fetch('/api/analyze', {
-        method: 'POST',
+      const response = await fetch("/api/analyze", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) {
-        throw new Error(`API failed: ${response.status}`);
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(
+          result.error || "AI analysis failed"
+        );
       }
 
-      return await response.json();
+      return result.data;
+
     } catch (error) {
-      console.error('[AIService.analyzeScript] Error:', error);
-      throw new Error('Failed to generate script evaluation from AI model.');
+      console.error(
+        "[AIService.analyzeScript] Error calling AI:",
+        error
+      );
+
+      throw new Error(
+        "Failed to generate script evaluation from AI model."
+      );
     }
   }
 
   /**
-   * Generate hook variations.
+   * Generates additional hook variations.
    */
-  static async generateHooksOnly(script: string, styleCount: number = 6) {
+  static async generateHooksOnly(
+    script: string,
+    styleCount: number = 6
+  ) {
     const response = await this.analyzeScript({
       script,
-      category: 'Hook Generation',
+      category: "Hook Generation",
     });
 
     return response.hooks.slice(0, styleCount);

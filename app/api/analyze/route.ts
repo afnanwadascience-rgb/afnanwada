@@ -1,95 +1,158 @@
 import { NextResponse } from "next/server";
-import OpenAI from "openai";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function POST(request: Request) {
   try {
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Gemini API key is missing.",
+        },
+        { status: 500 }
+      );
+    }
+
     const body = await request.json();
+
     const { script, category = "General" } = body;
 
     if (!script || !script.trim()) {
       return NextResponse.json(
-        { success: false, error: "Script text is required for analysis." },
+        {
+          success: false,
+          error: "Script text is required for analysis.",
+        },
         { status: 400 }
       );
     }
 
+    const genAI = new GoogleGenerativeAI(apiKey);
+
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash",
+      generationConfig: {
+        temperature: 0.7,
+        responseMimeType: "application/json",
+      },
+    });
+
+
     const prompt = `
-You are an expert YouTube growth strategist and script optimization AI. Analyze the following video script under the category "${category}".
-You MUST return ONLY valid JSON matching this exact structure, with no markdown code block formatting or extra text outside the JSON object:
+You are an expert YouTube growth strategist and script optimization AI.
+
+Analyze this YouTube script under the category: "${category}"
+
+Return ONLY valid JSON.
+Do not use markdown.
+Do not add explanations outside JSON.
+
+Required JSON format:
+
 {
-  "viralScore": 85,
+  "viralScore": number,
+
   "hooks": [
     {
-      "style": "Curiosity Gap",
-      "text": "Compelling hook text here...",
-      "rationale": "Explanation why this hook works..."
+      "style": "string",
+      "text": "string",
+      "rationale": "string"
     }
   ],
+
   "titles": [
     {
-      "title": "Optimized Title Here",
-      "ctrScore": 92,
-      "seoScore": 88,
-      "readabilityScore": 95
+      "title": "string",
+      "ctrScore": number,
+      "seoScore": number,
+      "readabilityScore": number
     }
   ],
+
   "thumbnailConcepts": {
-    "textIdeas": ["Idea 1", "Idea 2"],
-    "concept": "Detailed visual description of thumbnail...",
-    "colorPalette": ["#ff0000", "#000000"],
-    "emotionalFocus": "Curiosity & Urgency"
+    "textIdeas": [],
+    "concept": "string",
+    "colorPalette": [],
+    "emotionalFocus": "string"
   },
+
   "retentionAnalysis": {
-    "slowIntros": ["Point 1 about slow intros..."],
-    "weakTransitions": ["Point 1 about weak transitions..."],
-    "patternInterrupts": ["Point 1 about pattern interrupts..."]
+    "slowIntros": [],
+    "weakTransitions": [],
+    "patternInterrupts": []
   },
+
   "seoDescription": {
-    "fullText": "Full optimized YouTube description...",
-    "keywords": ["keyword1", "keyword2"],
-    "hashtags": ["hashtag1", "hashtag2"]
+    "fullText": "string",
+    "keywords": [],
+    "hashtags": []
   }
 }
 
-Script to analyze:
+
+SCRIPT:
+
 """
 ${script}
 """
 `;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: prompt }],
-      response_format: { type: "json_object" },
-    });
+    const result = await model.generateContent(prompt);
 
-    const responseText = response.choices[0]?.message?.content || "{}";
+    let responseText = result.response.text();
 
-    console.log("========== RAW AI RESPONSE ==========");
+    console.log("========== GEMINI RESPONSE ==========");
     console.log(responseText);
     console.log("====================================");
 
+
+    // Clean possible markdown formatting
+    responseText = responseText
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
+
+
     let parsedData;
+
     try {
       parsedData = JSON.parse(responseText);
-    } catch (parseError) {
-      // Robust fallback cleanup if markdown code blocks were included
-      const cleaned = responseText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-      parsedData = JSON.parse(cleaned);
+    } catch (error) {
+
+      console.error(
+        "JSON Parse Failed:",
+        responseText
+      );
+
+      return NextResponse.json(
+        {
+          success: false,
+          error: "AI returned invalid JSON format.",
+        },
+        { status: 500 }
+      );
     }
+
 
     return NextResponse.json({
       success: true,
       data: parsedData,
     });
+
+
   } catch (error: any) {
-    console.error("API Analyze Error:", error);
+
+    console.error("Gemini Analyze Error:", error);
+
     return NextResponse.json(
-      { success: false, error: error.message || "Failed to generate AI analysis" },
+      {
+        success: false,
+        error:
+          error.message ||
+          "Failed to generate AI analysis",
+      },
       { status: 500 }
     );
   }

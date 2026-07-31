@@ -9,6 +9,8 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { script, category = "Educational" } = body;
+    console.log("Received script:");
+    console.log(script);
 
     if (!script || typeof script !== "string" || script.trim().length < 20) {
       return NextResponse.json(
@@ -21,6 +23,7 @@ export async function POST(req: NextRequest) {
     }
 
     const response = await client.responses.create({
+
       model: "gpt-5.5",
       input: `
 You are an expert YouTube Script Analyzer.
@@ -76,26 +79,25 @@ Do not include explanations.
 Return JSON only.
 `,
     });
+console.log("AI response:");
+console.log(response.output_text);
+const text = response.output_text;
 
-    const text = response.output_text;
+console.log("Raw AI response:");
+console.log(text);
 
-    const analysisResult = JSON.parse(text);
+let analysisResult;
 
-    return NextResponse.json(
-      {
-        success: true,
-        data: analysisResult,
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error(error);
+try {
+  analysisResult = JSON.parse(text);
+} catch (e) {
+  console.error("Failed to parse AI response:", text);
 
-    return NextResponse.json(
-      {
-        error: "Failed to process script analysis.",
-      },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json(
+    {
+      error: "The AI returned an invalid JSON response.",
+      raw: text,
+    },
+    { status: 500 }
+  );
 }

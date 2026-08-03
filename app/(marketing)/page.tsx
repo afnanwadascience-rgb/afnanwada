@@ -10,7 +10,7 @@ import {
   Search,
   Image as ImageIcon,
   Pencil,
-  Youtube,
+  Play,
   GraduationCap,
   BookOpen,
   Video,

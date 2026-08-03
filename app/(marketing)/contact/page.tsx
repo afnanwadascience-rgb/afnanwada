@@ -33,7 +33,7 @@ export default function ContactPage() {
                 <Mail className="w-5 h-5" />
                 <h3 className="font-semibold text-white">Email Us</h3>
               </div>
-              <p className="text-sm text-slate-400">support@creatorpilot.ai</p>
+              <p className="text-sm text-slate-400">support@tupsar.ai</p>
             </div>
 
             <div className="p-6 rounded-2xl border border-white/10 bg-slate-900/50 backdrop-blur-lg space-y-4">

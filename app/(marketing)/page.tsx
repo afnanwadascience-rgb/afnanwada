@@ -85,7 +85,7 @@ const features = [
 ];
 
 const audiences = [
-  { title: 'YouTube Creators', description: 'Long-form creators who want higher CTR and watch time.', icon: Youtube },
+  { title: 'YouTube Creators', description: 'Long-form creators who want higher CTR and watch time.', icon: Play },
   { title: 'Educational Channels', description: 'Teachers and explainers who need clearer structure.', icon: GraduationCap },
   { title: 'Storytelling Channels', description: 'Narrative creators focused on emotional retention.', icon: BookOpen },
   { title: 'Faceless Creators', description: 'Automation and niche channels optimizing every script.', icon: Video },

@@ -150,20 +150,58 @@ export default function MarketingHomePage() {
             Find weak hooks, retention drops, viral opportunities, SEO improvements, titles, and thumbnail ideas in under 30 seconds.
           </p>
 
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/dashboard/analyze"
-              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-lg shadow-lg shadow-purple-500/25 transition-all duration-200 flex items-center justify-center gap-2 group"
-            >
-              Analyze My Script
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link
-              href="/features"
-              className="w-full sm:w-auto px-8 py-4 rounded-xl border border-slate-700/80 bg-slate-900/60 hover:bg-slate-800/80 text-slate-300 hover:text-white font-semibold text-lg backdrop-blur-md transition-all duration-200 text-center"
-            >
-              See Features
-            </Link>
+
+<div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+  <Link
+    href="/dashboard/analyze"
+    className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-lg shadow-lg shadow-purple-500/25 transition-all duration-200 flex items-center justify-center gap-2 group"
+  >
+    Analyze My Script
+    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+  </Link>
+
+  <Link
+    href="/features"
+    className="w-full sm:w-auto px-8 py-4 rounded-xl border border-slate-700/80 bg-slate-900/60 hover:bg-slate-800/80 text-slate-300 hover:text-white font-semibold text-lg backdrop-blur-md transition-all duration-200 text-center"
+  >
+    See Features
+  </Link>
+
+  <Link
+    href="/pricing"
+    className="w-full sm:w-auto px-8 py-4 rounded-xl border border-purple-500/40 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 hover:text-white font-semibold text-lg backdrop-blur-md transition-all duration-200 text-center"
+  >
+    View Pricing
+  </Link>
+</div>
+
+<nav
+  aria-label="Helpful pages"
+  className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm"
+>
+  <Link
+    href="/about"
+    className="text-slate-400 hover:text-white transition-colors"
+  >
+    About
+  </Link>
+
+  <Link
+    href="/contact"
+    className="text-slate-400 hover:text-white transition-colors"
+  >
+    Contact
+  </Link>
+
+  <Link
+    href="/faq"
+    className="text-slate-400 hover:text-white transition-colors"
+  >
+    FAQ
+  </Link>
+</nav>
+```
+
           </div>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-slate-400">

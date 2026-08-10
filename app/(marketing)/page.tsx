@@ -234,12 +234,7 @@ export default function MarketingHomePage() {
               See Features
             </Link>
 
-            <Link
-              href="/pricing"
-              className="w-full sm:w-auto px-8 py-4 rounded-xl border border-purple-500/40 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 hover:text-white font-semibold text-lg backdrop-blur-md transition-all duration-200 text-center"
-            >
-              View Pricing
-            </Link>
+
           </div>
 
           <nav

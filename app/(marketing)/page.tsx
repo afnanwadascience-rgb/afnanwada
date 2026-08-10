@@ -200,7 +200,7 @@ export default function MarketingHomePage() {
     FAQ
   </Link>
 </nav>
-```
+
 
           </div>
 

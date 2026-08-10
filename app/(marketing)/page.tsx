@@ -1,3 +1,4 @@
+```tsx
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -28,19 +29,22 @@ const howItWorks = [
   {
     step: '1',
     title: 'Paste your script',
-    description: 'Paste any YouTube, Shorts, or long-form script into the analyzer.',
+    description:
+      'Paste any YouTube, Shorts, or long-form script into the analyzer.',
     icon: FileText,
   },
   {
     step: '2',
     title: 'AI analyzes everything',
-    description: 'Hook strength, retention risks, SEO, titles, thumbnail ideas, and viral score.',
+    description:
+      'Hook strength, retention risks, SEO, titles, thumbnail ideas, and viral score.',
     icon: Brain,
   },
   {
     step: '3',
     title: 'Improve & publish',
-    description: 'Copy the suggestions and publish your next video with confidence.',
+    description:
+      'Copy the suggestions and publish your next video with confidence.',
     icon: Rocket,
   },
 ];
@@ -48,58 +52,118 @@ const howItWorks = [
 const features = [
   {
     title: 'Hook Generator',
-    description: 'Generate multiple high-retention opening hooks tailored to your topic and style.',
+    description:
+      'Generate multiple high-retention opening hooks tailored to your topic and style.',
     icon: Zap,
     color: 'purple',
   },
   {
     title: 'Retention Analysis',
-    description: 'Detect weak sections, slow pacing, and drop-off risks before you hit record.',
+    description:
+      'Detect weak sections, slow pacing, and drop-off risks before you hit record.',
     icon: TrendingUp,
     color: 'indigo',
   },
   {
     title: 'Viral Score',
-    description: 'Get a clear score based on emotional impact, pacing, and shareability signals.',
+    description:
+      'Get a clear score based on emotional impact, pacing, and shareability signals.',
     icon: BarChart3,
     color: 'pink',
   },
   {
     title: 'SEO Optimization',
-    description: 'Receive keyword suggestions and structure tips to rank better in search.',
+    description:
+      'Receive keyword suggestions and structure tips to rank better in search.',
     icon: Search,
     color: 'violet',
   },
   {
     title: 'Thumbnail Ideas',
-    description: 'Actionable concepts for high-CTR thumbnails that match your improved hooks.',
+    description:
+      'Actionable concepts for high-CTR thumbnails that match your improved hooks.',
     icon: ImageIcon,
     color: 'fuchsia',
   },
   {
     title: 'Script Improvements',
-    description: 'Concrete rewrites and line-level suggestions to tighten every part of your script.',
+    description:
+      'Concrete rewrites and line-level suggestions to tighten every part of your script.',
     icon: Pencil,
     color: 'blue',
   },
 ];
 
 const audiences = [
-  { title: 'YouTube Creators', description: 'Long-form creators who want higher CTR and watch time.', icon: Play },
-  { title: 'Educational Channels', description: 'Teachers and explainers who need clearer structure.', icon: GraduationCap },
-  { title: 'Storytelling Channels', description: 'Narrative creators focused on emotional retention.', icon: BookOpen },
-  { title: 'Faceless Creators', description: 'Automation and niche channels optimizing every script.', icon: Video },
-  { title: 'Shorts Creators', description: 'Vertical content that must hook in the first 3 seconds.', icon: Clapperboard },
-  { title: 'Agencies', description: 'Teams managing multiple channels and clients at scale.', icon: Building2 },
+  {
+    title: 'YouTube Creators',
+    description: 'Long-form creators who want higher CTR and watch time.',
+    icon: Play,
+  },
+  {
+    title: 'Educational Channels',
+    description: 'Teachers and explainers who need clearer structure.',
+    icon: GraduationCap,
+  },
+  {
+    title: 'Storytelling Channels',
+    description: 'Narrative creators focused on emotional retention.',
+    icon: BookOpen,
+  },
+  {
+    title: 'Faceless Creators',
+    description: 'Automation and niche channels optimizing every script.',
+    icon: Video,
+  },
+  {
+    title: 'Shorts Creators',
+    description: 'Vertical content that must hook in the first 3 seconds.',
+    icon: Clapperboard,
+  },
+  {
+    title: 'Agencies',
+    description: 'Teams managing multiple channels and clients at scale.',
+    icon: Building2,
+  },
 ];
 
 const benefits = [
-  { title: 'Save hours of editing', description: 'Fix structural problems before filming instead of in post.', icon: Clock },
-  { title: 'Catch weak hooks early', description: 'Never publish a video with a slow or confusing opening.', icon: Target },
-  { title: 'Improve viewer retention', description: 'Identify and remove the moments that cause drop-offs.', icon: TrendingUp },
-  { title: 'Generate better titles', description: 'Get multiple high-potential title options instantly.', icon: Type },
-  { title: 'Optimize for SEO', description: 'Align your script with what viewers actually search for.', icon: Search },
-  { title: 'Create stronger thumbnails', description: 'Pair powerful hooks with matching visual concepts.', icon: ImageIcon },
+  {
+    title: 'Save hours of editing',
+    description:
+      'Fix structural problems before filming instead of in post.',
+    icon: Clock,
+  },
+  {
+    title: 'Catch weak hooks early',
+    description:
+      'Never publish a video with a slow or confusing opening.',
+    icon: Target,
+  },
+  {
+    title: 'Improve viewer retention',
+    description:
+      'Identify and remove the moments that cause drop-offs.',
+    icon: TrendingUp,
+  },
+  {
+    title: 'Generate better titles',
+    description:
+      'Get multiple high-potential title options instantly.',
+    icon: Type,
+  },
+  {
+    title: 'Optimize for SEO',
+    description:
+      'Align your script with what viewers actually search for.',
+    icon: Search,
+  },
+  {
+    title: 'Create stronger thumbnails',
+    description:
+      'Pair powerful hooks with matching visual concepts.',
+    icon: ImageIcon,
+  },
 ];
 
 const faqs = [
@@ -109,15 +173,18 @@ const faqs = [
   },
   {
     question: 'Do you support every language?',
-    answer: 'Yes. CreatorPilot AI works with scripts written in any language.',
+    answer:
+      'Yes. CreatorPilot AI works with scripts written in any language.',
   },
   {
     question: 'Can I analyze Shorts?',
-    answer: 'Absolutely. Paste short-form scripts and get tailored feedback for vertical content.',
+    answer:
+      'Absolutely. Paste short-form scripts and get tailored feedback for vertical content.',
   },
   {
     question: 'Do I need an account?',
-    answer: 'You can start analyzing right away. No credit card is required to try it.',
+    answer:
+      'You can start analyzing right away. No credit card is required to try it.',
   },
 ];
 
@@ -147,72 +214,72 @@ export default function MarketingHomePage() {
           </h1>
 
           <p className="mt-6 max-w-2xl mx-auto text-lg sm:text-xl text-slate-400 leading-relaxed">
-            Find weak hooks, retention drops, viral opportunities, SEO improvements, titles, and thumbnail ideas in under 30 seconds.
+            Find weak hooks, retention drops, viral opportunities, SEO improvements,
+            titles, and thumbnail ideas in under 30 seconds.
           </p>
 
+          {/* Primary internal navigation */}
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="/dashboard/analyze"
+              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-lg shadow-lg shadow-purple-500/25 transition-all duration-200 flex items-center justify-center gap-2 group"
+            >
+              Analyze My Script
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
 
-<div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-  <Link
-    href="/dashboard/analyze"
-    className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-lg shadow-lg shadow-purple-500/25 transition-all duration-200 flex items-center justify-center gap-2 group"
-  >
-    Analyze My Script
-    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-  </Link>
+            <Link
+              href="/features"
+              className="w-full sm:w-auto px-8 py-4 rounded-xl border border-slate-700/80 bg-slate-900/60 hover:bg-slate-800/80 text-slate-300 hover:text-white font-semibold text-lg backdrop-blur-md transition-all duration-200 text-center"
+            >
+              See Features
+            </Link>
 
-  <Link
-    href="/features"
-    className="w-full sm:w-auto px-8 py-4 rounded-xl border border-slate-700/80 bg-slate-900/60 hover:bg-slate-800/80 text-slate-300 hover:text-white font-semibold text-lg backdrop-blur-md transition-all duration-200 text-center"
-  >
-    See Features
-  </Link>
-
-  <Link
-    href="/pricing"
-    className="w-full sm:w-auto px-8 py-4 rounded-xl border border-purple-500/40 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 hover:text-white font-semibold text-lg backdrop-blur-md transition-all duration-200 text-center"
-  >
-    View Pricing
-  </Link>
-</div>
-
-<nav
-  aria-label="Helpful pages"
-  className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm"
->
-  <Link
-    href="/about"
-    className="text-slate-400 hover:text-white transition-colors"
-  >
-    About
-  </Link>
-
-  <Link
-    href="/contact"
-    className="text-slate-400 hover:text-white transition-colors"
-  >
-    Contact
-  </Link>
-
-  <Link
-    href="/faq"
-    className="text-slate-400 hover:text-white transition-colors"
-  >
-    FAQ
-  </Link>
-</nav>
-
-
+            <Link
+              href="/pricing"
+              className="w-full sm:w-auto px-8 py-4 rounded-xl border border-purple-500/40 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 hover:text-white font-semibold text-lg backdrop-blur-md transition-all duration-200 text-center"
+            >
+              View Pricing
+            </Link>
           </div>
+
+          <nav
+            aria-label="Helpful pages"
+            className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm"
+          >
+            <Link
+              href="/about"
+              className="text-slate-400 hover:text-white transition-colors"
+            >
+              About
+            </Link>
+
+            <Link
+              href="/contact"
+              className="text-slate-400 hover:text-white transition-colors"
+            >
+              Contact
+            </Link>
+
+            <Link
+              href="/faq"
+              className="text-slate-400 hover:text-white transition-colors"
+            >
+              FAQ
+            </Link>
+          </nav>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-slate-400">
             <span className="inline-flex items-center gap-1.5">
               <Check className="w-4 h-4 text-emerald-400" />
               No credit card required
             </span>
+
             <span className="inline-flex items-center gap-1.5">
               <Check className="w-4 h-4 text-emerald-400" />
               Supports every language
             </span>
+
             <span className="inline-flex items-center gap-1.5">
               <Check className="w-4 h-4 text-emerald-400" />
               Results in about 20 seconds
@@ -226,6 +293,7 @@ export default function MarketingHomePage() {
             <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
               How it works
             </h2>
+
             <p className="mt-3 text-slate-400 text-lg max-w-xl mx-auto">
               Three simple steps from script to stronger video.
             </p>
@@ -234,6 +302,7 @@ export default function MarketingHomePage() {
           <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
             {howItWorks.map((item) => {
               const Icon = item.icon;
+
               return (
                 <div
                   key={item.step}
@@ -242,11 +311,18 @@ export default function MarketingHomePage() {
                   <div className="absolute -top-3 left-8 px-3 py-0.5 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-semibold">
                     Step {item.step}
                   </div>
+
                   <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-5 group-hover:scale-105 transition-transform">
                     <Icon className="w-6 h-6" />
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">{item.title}</h3>
-                  <p className="text-slate-400 text-sm leading-relaxed">{item.description}</p>
+
+                  <h3 className="text-xl font-semibold text-white mb-2">
+                    {item.title}
+                  </h3>
+
+                  <p className="text-slate-400 text-sm leading-relaxed">
+                    {item.description}
+                  </p>
                 </div>
               );
             })}
@@ -259,54 +335,72 @@ export default function MarketingHomePage() {
             <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
               See what you get
             </h2>
+
             <p className="mt-3 text-slate-400 text-lg max-w-xl mx-auto">
               A real product-style preview of the analysis you receive in seconds.
             </p>
           </div>
 
           <div className="max-w-3xl mx-auto rounded-3xl border border-white/10 bg-slate-900/70 backdrop-blur-xl shadow-2xl shadow-purple-900/20 overflow-hidden">
-            {/* Mock window header */}
             <div className="flex items-center gap-2 px-5 py-3 border-b border-white/5 bg-slate-950/80">
               <div className="w-3 h-3 rounded-full bg-red-500/80" />
               <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
               <div className="w-3 h-3 rounded-full bg-green-500/80" />
-              <span className="ml-3 text-xs text-slate-500 font-medium">CreatorPilot Analysis</span>
+              <span className="ml-3 text-xs text-slate-500 font-medium">
+                CreatorPilot Analysis
+              </span>
             </div>
 
             <div className="p-6 sm:p-8 space-y-6">
-              {/* Original Hook */}
               <div>
-                <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Original Hook</p>
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">
+                  Original Hook
+                </p>
+
                 <div className="px-4 py-3 rounded-xl bg-slate-950/60 border border-white/5 text-slate-400 text-sm leading-relaxed">
-                  &ldquo;Hey guys, today I want to talk about something that might help you grow on YouTube...&rdquo;
+                  &ldquo;Hey guys, today I want to talk about something that might
+                  help you grow on YouTube...&rdquo;
                 </div>
               </div>
 
-              {/* Improved Hook */}
               <div>
-                <p className="text-xs font-medium text-emerald-400/80 uppercase tracking-wider mb-2">Improved Hook</p>
+                <p className="text-xs font-medium text-emerald-400/80 uppercase tracking-wider mb-2">
+                  Improved Hook
+                </p>
+
                 <div className="px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-100 text-sm leading-relaxed">
-                  &ldquo;Most creators lose 70% of viewers in the first 8 seconds. Here&apos;s the exact fix that doubled my retention.&rdquo;
+                  &ldquo;Most creators lose 70% of viewers in the first 8 seconds.
+                  Here&apos;s the exact fix that doubled my retention.&rdquo;
                 </div>
               </div>
 
-              {/* Metrics row */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 rounded-xl bg-slate-950/50 border border-white/5">
                   <p className="text-xs text-slate-500 mb-1">Retention Risk</p>
-                  <p className="text-lg font-semibold text-amber-400">Medium → Low</p>
+                  <p className="text-lg font-semibold text-amber-400">
+                    Medium → Low
+                  </p>
                 </div>
+
                 <div className="p-4 rounded-xl bg-slate-950/50 border border-white/5">
                   <p className="text-xs text-slate-500 mb-1">Viral Score</p>
-                  <p className="text-lg font-semibold text-purple-400">72 → 89</p>
+                  <p className="text-lg font-semibold text-purple-400">
+                    72 → 89
+                  </p>
                 </div>
               </div>
 
-              {/* SEO Suggestions */}
               <div>
-                <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">SEO Suggestions</p>
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">
+                  SEO Suggestions
+                </p>
+
                 <div className="flex flex-wrap gap-2">
-                  {['youtube retention tips', 'how to keep viewers watching', 'script hooks that work'].map((tag) => (
+                  {[
+                    'youtube retention tips',
+                    'how to keep viewers watching',
+                    'script hooks that work',
+                  ].map((tag) => (
                     <span
                       key={tag}
                       className="px-3 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-medium"
@@ -317,7 +411,6 @@ export default function MarketingHomePage() {
                 </div>
               </div>
 
-              {/* Copy button (visual only) */}
               <button
                 type="button"
                 className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium text-slate-200 transition-colors flex items-center justify-center gap-2"
@@ -335,6 +428,7 @@ export default function MarketingHomePage() {
             <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
               Everything you need to improve every script
             </h2>
+
             <p className="mt-3 text-slate-400 text-lg max-w-xl mx-auto">
               Six focused tools that turn a rough draft into a high-performing video.
             </p>
@@ -343,6 +437,7 @@ export default function MarketingHomePage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature) => {
               const Icon = feature.icon;
+
               return (
                 <div
                   key={feature.title}
@@ -351,8 +446,14 @@ export default function MarketingHomePage() {
                   <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-4">
                     <Icon className="w-6 h-6" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">{feature.title}</h3>
-                  <p className="text-slate-400 text-sm leading-relaxed">{feature.description}</p>
+
+                  <h3 className="text-lg font-semibold text-white mb-2">
+                    {feature.title}
+                  </h3>
+
+                  <p className="text-slate-400 text-sm leading-relaxed">
+                    {feature.description}
+                  </p>
                 </div>
               );
             })}
@@ -365,6 +466,7 @@ export default function MarketingHomePage() {
             <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
               Built for every type of creator
             </h2>
+
             <p className="mt-3 text-slate-400 text-lg max-w-xl mx-auto">
               Whether you film face-to-camera or run faceless channels, the analysis adapts to you.
             </p>
@@ -373,6 +475,7 @@ export default function MarketingHomePage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {audiences.map((audience) => {
               const Icon = audience.icon;
+
               return (
                 <div
                   key={audience.title}
@@ -381,9 +484,15 @@ export default function MarketingHomePage() {
                   <div className="shrink-0 w-11 h-11 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
                     <Icon className="w-5 h-5" />
                   </div>
+
                   <div>
-                    <h3 className="font-semibold text-white">{audience.title}</h3>
-                    <p className="mt-1 text-sm text-slate-400 leading-relaxed">{audience.description}</p>
+                    <h3 className="font-semibold text-white">
+                      {audience.title}
+                    </h3>
+
+                    <p className="mt-1 text-sm text-slate-400 leading-relaxed">
+                      {audience.description}
+                    </p>
                   </div>
                 </div>
               );
@@ -397,6 +506,7 @@ export default function MarketingHomePage() {
             <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
               Why creators use CreatorPilot AI
             </h2>
+
             <p className="mt-3 text-slate-400 text-lg max-w-xl mx-auto">
               Practical advantages you feel on your next upload.
             </p>
@@ -405,6 +515,7 @@ export default function MarketingHomePage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {benefits.map((benefit) => {
               const Icon = benefit.icon;
+
               return (
                 <div
                   key={benefit.title}
@@ -413,8 +524,14 @@ export default function MarketingHomePage() {
                   <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400 mb-4">
                     <Icon className="w-5 h-5" />
                   </div>
-                  <h3 className="text-base font-semibold text-white mb-1.5">{benefit.title}</h3>
-                  <p className="text-sm text-slate-400 leading-relaxed">{benefit.description}</p>
+
+                  <h3 className="text-base font-semibold text-white mb-1.5">
+                    {benefit.title}
+                  </h3>
+
+                  <p className="text-sm text-slate-400 leading-relaxed">
+                    {benefit.description}
+                  </p>
                 </div>
               );
             })}
@@ -427,6 +544,7 @@ export default function MarketingHomePage() {
             <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
               Frequently asked questions
             </h2>
+
             <p className="mt-3 text-slate-400 text-lg max-w-xl mx-auto">
               Quick answers to the most common questions.
             </p>
@@ -440,13 +558,29 @@ export default function MarketingHomePage() {
               >
                 <div className="px-6 py-5 flex items-start justify-between gap-4">
                   <div>
-                    <h3 className="font-semibold text-white text-base">{faq.question}</h3>
-                    <p className="mt-2 text-sm text-slate-400 leading-relaxed">{faq.answer}</p>
+                    <h3 className="font-semibold text-white text-base">
+                      {faq.question}
+                    </h3>
+
+                    <p className="mt-2 text-sm text-slate-400 leading-relaxed">
+                      {faq.answer}
+                    </p>
                   </div>
+
                   <ChevronDown className="w-5 h-5 text-slate-500 shrink-0 mt-0.5" />
                 </div>
               </div>
             ))}
+          </div>
+
+          <div className="mt-8 text-center">
+            <Link
+              href="/faq"
+              className="inline-flex items-center gap-2 text-sm font-medium text-purple-400 hover:text-purple-300 transition-colors"
+            >
+              View all FAQs
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </section>
 
@@ -461,9 +595,12 @@ export default function MarketingHomePage() {
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
                 Ready to improve your next video?
               </h2>
+
               <p className="mt-4 text-slate-300 max-w-lg mx-auto text-lg">
-                Paste your script and get actionable feedback in about 20 seconds. No credit card required.
+                Paste your script and get actionable feedback in about 20 seconds.
+                No credit card required.
               </p>
+
               <Link
                 href="/dashboard/analyze"
                 className="mt-8 inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-white text-slate-950 font-bold text-lg hover:bg-slate-100 transition-colors shadow-lg shadow-white/10"
@@ -478,3 +615,4 @@ export default function MarketingHomePage() {
     </div>
   );
 }
+```

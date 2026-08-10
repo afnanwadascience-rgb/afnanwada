@@ -1,4 +1,3 @@
-```tsx
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -214,8 +213,8 @@ export default function MarketingHomePage() {
           </h1>
 
           <p className="mt-6 max-w-2xl mx-auto text-lg sm:text-xl text-slate-400 leading-relaxed">
-            Find weak hooks, retention drops, viral opportunities, SEO improvements,
-            titles, and thumbnail ideas in under 30 seconds.
+            Find weak hooks, retention drops, viral opportunities, SEO
+            improvements, titles, and thumbnail ideas in under 30 seconds.
           </p>
 
           {/* Primary internal navigation */}
@@ -337,7 +336,8 @@ export default function MarketingHomePage() {
             </h2>
 
             <p className="mt-3 text-slate-400 text-lg max-w-xl mx-auto">
-              A real product-style preview of the analysis you receive in seconds.
+              A real product-style preview of the analysis you receive in
+              seconds.
             </p>
           </div>
 
@@ -358,8 +358,8 @@ export default function MarketingHomePage() {
                 </p>
 
                 <div className="px-4 py-3 rounded-xl bg-slate-950/60 border border-white/5 text-slate-400 text-sm leading-relaxed">
-                  &ldquo;Hey guys, today I want to talk about something that might
-                  help you grow on YouTube...&rdquo;
+                  &ldquo;Hey guys, today I want to talk about something that
+                  might help you grow on YouTube...&rdquo;
                 </div>
               </div>
 
@@ -369,8 +369,9 @@ export default function MarketingHomePage() {
                 </p>
 
                 <div className="px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-100 text-sm leading-relaxed">
-                  &ldquo;Most creators lose 70% of viewers in the first 8 seconds.
-                  Here&apos;s the exact fix that doubled my retention.&rdquo;
+                  &ldquo;Most creators lose 70% of viewers in the first 8
+                  seconds. Here&apos;s the exact fix that doubled my
+                  retention.&rdquo;
                 </div>
               </div>
 
@@ -430,7 +431,8 @@ export default function MarketingHomePage() {
             </h2>
 
             <p className="mt-3 text-slate-400 text-lg max-w-xl mx-auto">
-              Six focused tools that turn a rough draft into a high-performing video.
+              Six focused tools that turn a rough draft into a high-performing
+              video.
             </p>
           </div>
 
@@ -468,7 +470,8 @@ export default function MarketingHomePage() {
             </h2>
 
             <p className="mt-3 text-slate-400 text-lg max-w-xl mx-auto">
-              Whether you film face-to-camera or run faceless channels, the analysis adapts to you.
+              Whether you film face-to-camera or run faceless channels, the
+              analysis adapts to you.
             </p>
           </div>
 
@@ -597,8 +600,8 @@ export default function MarketingHomePage() {
               </h2>
 
               <p className="mt-4 text-slate-300 max-w-lg mx-auto text-lg">
-                Paste your script and get actionable feedback in about 20 seconds.
-                No credit card required.
+                Paste your script and get actionable feedback in about 20
+                seconds. No credit card required.
               </p>
 
               <Link
@@ -615,4 +618,3 @@ export default function MarketingHomePage() {
     </div>
   );
 }
-```

@@ -24,6 +24,12 @@ import {
   ChevronDown,
 } from 'lucide-react';
 
+export const metadata = {
+  alternates: {
+    canonical: 'https://afnanwada-iota.vercel.app/',
+  },
+};
+
 const howItWorks = [
   {
     step: '1',

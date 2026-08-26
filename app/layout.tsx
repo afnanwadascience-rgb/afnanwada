@@ -43,6 +43,13 @@ export default function RootLayout({
               </Link>
 
               <Link
+                href="/pricing"
+                className="hover:text-white transition-colors"
+              >
+                Pricing
+              </Link>
+
+              <Link
                 href="/about"
                 className="hover:text-white transition-colors"
               >

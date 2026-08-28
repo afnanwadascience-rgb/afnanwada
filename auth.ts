@@ -1,16 +1,13 @@
-import NextAuth from "next-auth";
+import NextAuth, { type DefaultSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import type { Plan, Role } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import type { Plan, Role } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 
 declare module "next-auth" {
   interface User {
     id: string;
-    email: string;
-    name?: string | null;
     role: Role;
     plan: Plan;
   }
@@ -18,41 +15,44 @@ declare module "next-auth" {
   interface Session {
     user: {
       id: string;
-      email: string;
-      name?: string | null;
       role: Role;
       plan: Plan;
-    };
+    } & DefaultSession["user"];
   }
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
   },
-  trustHost: true,
+
+  pages: {
+    signIn: "/login",
+  },
 
   providers: [
     Credentials({
       name: "Credentials",
+
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        email: {
+          label: "Email",
+          type: "email",
+        },
+        password: {
+          label: "Password",
+          type: "password",
+        },
       },
 
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
-
         const email =
-          typeof credentials.email === "string"
+          typeof credentials?.email === "string"
             ? credentials.email.trim().toLowerCase()
             : "";
 
         const password =
-          typeof credentials.password === "string"
+          typeof credentials?.password === "string"
             ? credentials.password
             : "";
 
@@ -62,18 +62,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const user = await prisma.user.findUnique({
           where: { email },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            password: true,
+            role: true,
+            plan: true,
+          },
         });
 
         if (!user?.password) {
           return null;
         }
 
-        const passwordValid = await bcrypt.compare(
-          password,
-          user.password,
-        );
+        const valid = await bcrypt.compare(password, user.password);
 
-        if (!passwordValid) {
+        if (!valid) {
           return null;
         }
 
@@ -92,8 +97,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.email = user.email;
-        token.name = user.name;
         token.role = user.role;
         token.plan = user.plan;
       }
@@ -102,19 +105,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
 
     async session({ session, token }) {
-      session.user = {
-        id: String(token.id),
-        email: String(token.email),
-        name: typeof token.name === "string" ? token.name : null,
-        role: token.role as Role,
-        plan: token.plan as Plan,
-      };
-
+      session.user.id = String(token.id);
+      session.user.role = token.role as Role;
+      session.user.plan = token.plan as Plan;
       return session;
     },
   },
 
-  pages: {
-    signIn: "/login",
-  },
+  trustHost: true,
 });

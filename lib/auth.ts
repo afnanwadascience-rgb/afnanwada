@@ -72,7 +72,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           },
         });
 
-        if (!user || !user.password) {
+        if (!user?.password) {
           return null;
         }
 
@@ -108,7 +108,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       session.user.id = String(token.id);
       session.user.role = token.role as Role;
       session.user.plan = token.plan as Plan;
-
       return session;
     },
   },

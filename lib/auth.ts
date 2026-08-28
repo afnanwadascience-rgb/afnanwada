@@ -1,6 +1,6 @@
 import NextAuth, { type DefaultSession } from "next-auth";
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import Credentials from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import type { Plan, Role } from "@prisma/client";
 
@@ -22,13 +22,6 @@ declare module "next-auth" {
   }
 }
 
-declare module "@auth/core/adapters" {
-  interface AdapterUser {
-    role: Role;
-    plan: Plan;
-  }
-}
-
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
 
@@ -42,6 +35,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
   providers: [
     Credentials({
+      name: "Credentials",
+
       credentials: {
         email: {
           label: "Email",
@@ -54,22 +49,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
 
       async authorize(credentials) {
-        const email = credentials?.email;
-        const password = credentials?.password;
-
-        if (typeof email !== "string" || typeof password !== "string") {
+        if (!credentials) {
           return null;
         }
 
-        const normalizedEmail = email.trim().toLowerCase();
+        const email =
+          typeof credentials.email === "string"
+            ? credentials.email.trim().toLowerCase()
+            : "";
 
-        if (!normalizedEmail || !password) {
+        const password =
+          typeof credentials.password === "string"
+            ? credentials.password
+            : "";
+
+        if (!email || !password) {
           return null;
         }
 
         const user = await prisma.user.findUnique({
           where: {
-            email: normalizedEmail,
+            email,
           },
         });
 

@@ -1,6 +1,5 @@
 import NextAuth, { type DefaultSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import type { Plan, Role } from "@prisma/client";
 
@@ -23,8 +22,6 @@ declare module "next-auth" {
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
-
   session: {
     strategy: "jwt",
   },
@@ -49,17 +46,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
 
       async authorize(credentials) {
-        if (!credentials) {
-          return null;
-        }
-
         const email =
-          typeof credentials.email === "string"
+          typeof credentials?.email === "string"
             ? credentials.email.trim().toLowerCase()
             : "";
 
         const password =
-          typeof credentials.password === "string"
+          typeof credentials?.password === "string"
             ? credentials.password
             : "";
 
@@ -68,8 +61,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         const user = await prisma.user.findUnique({
-          where: {
-            email,
+          where: { email },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            password: true,
+            role: true,
+            plan: true,
           },
         });
 
@@ -77,12 +76,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
-        const isValidPassword = await bcrypt.compare(
-          password,
-          user.password,
-        );
+        const valid = await bcrypt.compare(password, user.password);
 
-        if (!isValidPassword) {
+        if (!valid) {
           return null;
         }
 
@@ -116,4 +112,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return session;
     },
   },
+
+  trustHost: true,
 });

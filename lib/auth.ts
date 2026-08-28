@@ -4,6 +4,13 @@ import bcrypt from "bcryptjs";
 import type { Plan, Role } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
+export type UserSession = {
+  id: string;
+  email: string;
+  name?: string | null;
+  role: Role;
+  plan: Plan;
+};
 
 declare module "next-auth" {
   interface User {

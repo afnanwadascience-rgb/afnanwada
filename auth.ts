@@ -89,16 +89,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       return token;
     },
-    async session({ session, token }) {
-      session.user = {
-        id: token.id,
-        email: token.email,
-        name: token.name,
-        role: token.role,
-        plan: token.plan,
-      };
-
-      return session;
-    },
-  },
+    async session({ session, token }) {`r`n      session.user = {`r`n        id: String(token.id),`r`n        email: String(token.email),`r`n        name: typeof token.name === "string" ? token.name : null,`r`n        role: token.role as Role,`r`n        plan: token.plan as Plan,`r`n      };`r`n`r`n      return session;`r`n    },,
 });
+

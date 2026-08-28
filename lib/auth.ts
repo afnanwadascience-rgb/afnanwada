@@ -1,30 +1,135 @@
-import { NextRequest } from 'next/server';
+import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import type { Plan, Role } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
-export interface UserSession {
-  id: string;
-  email: string;
-  role: 'USER' | 'ADMIN';
-  plan: 'FREE' | 'PRO';
+import { prisma } from "@/lib/prisma";
+
+declare module "next-auth" {
+  interface User {
+    id: string;
+    email: string;
+    name?: string | null;
+    role: Role;
+    plan: Plan;
+  }
+
+  interface Session {
+    user: {
+      id: string;
+      email: string;
+      name?: string | null;
+      role: Role;
+      plan: Plan;
+    };
+  }
 }
 
-/**
- * Extracts session context from request headers/cookies.
- * Mock implementation ready for integration with NextAuth, Clerk, or Supabase Auth.
- */
-export async function getSession(req?: NextRequest): Promise<UserSession | null> {
-  // Demo mock user session
-  return {
-    id: 'usr_101',
-    email: 'creator@example.com',
-    role: 'USER',
-    plan: 'FREE',
-  };
-}
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  adapter: PrismaAdapter(prisma),
 
-/**
- * Verifies if the request originates from an authenticated user.
- */
-export async function isAuthenticated(req: NextRequest): Promise<boolean> {
-  const session = await getSession(req);
-  return !!session;
-}
+  session: {
+    strategy: "jwt",
+  },
+
+  trustHost: true,
+
+  providers: [
+    Credentials({
+      name: "Credentials",
+
+      credentials: {
+        email: {
+          label: "Email",
+          type: "email",
+        },
+        password: {
+          label: "Password",
+          type: "password",
+        },
+      },
+
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+
+        const email =
+          typeof credentials.email === "string"
+            ? credentials.email.trim().toLowerCase()
+            : "";
+
+        const password =
+          typeof credentials.password === "string"
+            ? credentials.password
+            : "";
+
+        if (!email || !password) {
+          return null;
+        }
+
+        const user = await prisma.user.findUnique({
+          where: {
+            email,
+          },
+        });
+
+        if (!user || !user.password) {
+          return null;
+        }
+
+        const passwordValid = await bcrypt.compare(
+          password,
+          user.password,
+        );
+
+        if (!passwordValid) {
+          return null;
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          plan: user.plan,
+        };
+      },
+    }),
+  ],
+
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
+        token.role = user.role;
+        token.plan = user.plan;
+      }
+
+      return token;
+    },
+
+    async session({ session, token }) {
+      session.user = {
+        id: String(token.id),
+        email: String(token.email),
+        name: typeof token.name === "string" ? token.name : null,
+        role: token.role as Role,
+        plan: token.plan as Plan,
+      };
+
+      return session;
+    },
+
+    authorized({ auth }) {
+      return !!auth?.user;
+    },
+  },
+
+  pages: {
+    signIn: "/login",
+  },
+});

@@ -26,28 +26,35 @@ declare module "next-auth" {
   }
 }
 
-
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: {
-    // Required: Credentials does not create adapter Session rows.
     strategy: "jwt",
   },
   trustHost: true,
+
   providers: [
     Credentials({
-      name: "credentials",
+      name: "Credentials",
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
+
       async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+
         const email =
-          typeof credentials?.email === "string"
+          typeof credentials.email === "string"
             ? credentials.email.trim().toLowerCase()
             : "";
+
         const password =
-          typeof credentials?.password === "string" ? credentials.password : "";
+          typeof credentials.password === "string"
+            ? credentials.password
+            : "";
 
         if (!email || !password) {
           return null;
@@ -57,13 +64,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           where: { email },
         });
 
-        // Same failure path whether the user is missing or has no password hash.
         if (!user?.password) {
           return null;
         }
 
-        const passwordMatches = await bcrypt.compare(password, user.password);
-        if (!passwordMatches) {
+        const passwordValid = await bcrypt.compare(
+          password,
+          user.password,
+        );
+
+        if (!passwordValid) {
           return null;
         }
 
@@ -77,6 +87,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
+
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -89,6 +100,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       return token;
     },
-    async session({ session, token }) {`r`n      session.user = {`r`n        id: String(token.id),`r`n        email: String(token.email),`r`n        name: typeof token.name === "string" ? token.name : null,`r`n        role: token.role as Role,`r`n        plan: token.plan as Plan,`r`n      };`r`n`r`n      return session;`r`n    },,
-});
 
+    async session({ session, token }) {
+      session.user = {
+        id: String(token.id),
+        email: String(token.email),
+        name: typeof token.name === "string" ? token.name : null,
+        role: token.role as Role,
+        plan: token.plan as Plan,
+      };
+
+      return session;
+    },
+  },
+
+  pages: {
+    signIn: "/login",
+  },
+});

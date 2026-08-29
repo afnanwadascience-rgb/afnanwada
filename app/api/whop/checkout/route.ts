@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { WhopClient } from "@whop/sdk";
 
 import { auth } from "@/auth";
+export const dynamic = "force-dynamic";
 
 // Set WHOP_PLAN_ID in your server environment to the existing CreatorPilot AI
 // PRO plan ID from the Whop dashboard (Dashboard → Products / Checkout links).

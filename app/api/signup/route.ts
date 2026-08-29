@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { Plan, Role } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
+export const dynamic = "force-dynamic";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const BCRYPT_SALT_ROUNDS = 12;

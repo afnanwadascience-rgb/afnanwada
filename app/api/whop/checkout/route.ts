@@ -1,67 +1,114 @@
-import { NextResponse } from "next/server";
-import { WhopClient } from "@whop/sdk";
+"use client";
 
-import { auth } from "@/auth";
-export const dynamic = "force-dynamic";
+import { useState } from "react";
+import Link from "next/link";
 
-// Set WHOP_PLAN_ID in your server environment to the existing CreatorPilot AI
-// PRO plan ID from the Whop dashboard (Dashboard → Products / Checkout links).
-// That plan must already be a $5 USD / month recurring subscription
-// (plan_type: renewal, billing_period: 30). Do not invent this ID in code.
+export default function CheckoutPage() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-const WHOP_ACCOUNT_ID = "biz_F6es4HVznLQC5p";
+  const handleUpgrade = async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-export async function POST() {
-  const session = await auth();
-  const userId = session?.user?.id;
-  const email = session?.user?.email;
+      const response = await fetch("/api/whop/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-  if (!userId || !email) {
-    return NextResponse.json(
-      { error: "You must be signed in to start checkout." },
-      { status: 401 },
-    );
-  }
+      const data = await response.json();
 
-  const apiKey = process.env.WHOP_API_KEY;
-  const planId = process.env.WHOP_PLAN_ID;
+      if (!response.ok) {
+        setError(data.error || "Unable to start checkout.");
+        return;
+      }
 
-  if (!apiKey || !planId) {
-    return NextResponse.json(
-      { error: "Checkout is not configured." },
-      { status: 500 },
-    );
-  }
+      if (!data.checkoutUrl) {
+        setError("Whop did not return a checkout URL.");
+        return;
+      }
 
-  try {
-    const whop = new WhopClient({
-      token: apiKey,
-    });
-
-    const checkout = await whop.checkoutConfigurations.create({
-      account_id: WHOP_ACCOUNT_ID,
-      plan_id: planId,
-      mode: "payment",
-      metadata: {
-        userId,
-        email,
-      },
-    });
-
-    if (!checkout.purchase_url) {
-      return NextResponse.json(
-        { error: "Whop did not return a checkout URL." },
-        { status: 502 },
-      );
+      window.location.href = data.checkoutUrl;
+    } catch (err) {
+      console.error("Checkout error:", err);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    return NextResponse.json({
-      checkoutUrl: checkout.purchase_url,
-    });
-  } catch {
-    return NextResponse.json(
-      { error: "Unable to start Whop checkout. Please try again." },
-      { status: 502 },
-    );
-  }
+  return (
+    <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-6 py-12">
+      <div className="w-full max-w-md">
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur">
+          <div className="mb-8 text-center">
+            <p className="mb-2 text-sm font-medium text-blue-400">
+              CreatorPilot AI
+            </p>
+
+            <h1 className="text-3xl font-bold">
+              Upgrade to PRO
+            </h1>
+
+            <p className="mt-3 text-sm text-slate-400">
+              Unlock unlimited script analyses and all PRO features.
+            </p>
+          </div>
+
+          <div className="mb-6 rounded-xl border border-white/10 bg-white/5 p-5">
+            <div className="flex items-end justify-between">
+              <div>
+                <h2 className="text-lg font-semibold">PRO Plan</h2>
+                <p className="mt-1 text-sm text-slate-400">
+                  Monthly subscription
+                </p>
+              </div>
+
+              <div className="text-right">
+                <div className="text-3xl font-bold">$5</div>
+                <div className="text-xs text-slate-400">/month</div>
+              </div>
+            </div>
+
+            <div className="mt-5 space-y-3 text-sm text-slate-300">
+              <div>✓ Unlimited script analyses</div>
+              <div>✓ PRO features unlocked</div>
+              <div>✓ Monthly subscription</div>
+            </div>
+          </div>
+
+          {error && (
+            <div className="mb-5 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+              {error}
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={handleUpgrade}
+            disabled={loading}
+            className="w-full rounded-xl bg-blue-600 px-5 py-3.5 font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loading ? "Opening checkout..." : "Upgrade to PRO — $5/month"}
+          </button>
+
+          <p className="mt-4 text-center text-xs text-slate-500">
+            You will be redirected to Whop to securely complete your payment.
+          </p>
+
+          <div className="mt-6 text-center">
+            <Link
+              href="/pricing"
+              className="text-sm text-slate-400 transition hover:text-white"
+            >
+              ← Back to pricing
+            </Link>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
 }

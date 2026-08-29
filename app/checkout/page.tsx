@@ -60,7 +60,7 @@ export default function CheckoutPage() {
           disabled={loading}
           className="w-full rounded-xl bg-blue-600 px-6 py-3 font-semibold hover:bg-blue-500 disabled:opacity-60"
         >
-          {loading ? "Opening Whop checkout..." : "Upgrade to PRO — $5/month"}
+          {loading ? "Opening Whop checkout..." : "Upgrade to PRO â€” $5/month"}
         </button>
 
         <Link

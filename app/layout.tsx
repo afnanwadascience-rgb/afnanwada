@@ -1,32 +1,31 @@
-import type { Metadata } from 'next';
-import Link from 'next/link';
-import Script from 'next/script';
-import { Sparkles, Shield } from 'lucide-react';
-import './globals.css';
+import type { Metadata } from "next";
+import Link from "next/link";
+import Script from "next/script";
+import { Sparkles, Shield } from "lucide-react";
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: 'CreatorPilot AI | YouTube Script Optimization Suite',
+  title: "CreatorPilot AI | YouTube Script Optimization Suite",
   description:
-    'AI-powered script analysis for YouTube creators. Improve CTR, retention, and video SEO before recording.',
+    "AI-powered script analysis for YouTube creators. Improve CTR, retention, and video SEO before recording.",
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="en" className="dark">
-      <body className="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
-        {/* Navigation Navbar */}
+      <body className="min-h-screen flex flex-col bg-slate-950 text-slate-100">
         <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/80 backdrop-blur-xl">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
             <Link
               href="/"
               className="flex items-center gap-2.5 font-extrabold text-lg text-white"
             >
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-purple-500/20">
-                <Sparkles className="w-4 h-4" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-500 text-white shadow-md shadow-purple-500/20">
+                <Sparkles className="h-4 w-4" />
               </div>
 
               <span>
@@ -34,40 +33,54 @@ export default function RootLayout({
               </span>
             </Link>
 
-            <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-400">
+            <nav className="hidden items-center gap-6 text-sm font-medium text-slate-400 md:flex">
               <Link
                 href="/features"
-                className="hover:text-white transition-colors"
+                className="transition-colors hover:text-white"
               >
                 Features
               </Link>
 
               <Link
                 href="/pricing"
-                className="hover:text-white transition-colors"
+                className="transition-colors hover:text-white"
               >
                 Pricing
               </Link>
 
               <Link
                 href="/about"
-                className="hover:text-white transition-colors"
+                className="transition-colors hover:text-white"
               >
                 About
               </Link>
 
               <Link
                 href="/faq"
-                className="hover:text-white transition-colors"
+                className="transition-colors hover:text-white"
               >
                 FAQ
               </Link>
             </nav>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Link
+                href="/login"
+                className="rounded-xl border border-white/10 px-3 py-2 text-xs font-semibold text-slate-300 transition-all hover:bg-white/5 hover:text-white sm:px-4 sm:text-sm"
+              >
+                Sign In
+              </Link>
+
+              <Link
+                href="/signup"
+                className="rounded-xl bg-purple-600 px-3 py-2 text-xs font-semibold text-white shadow-md shadow-purple-600/30 transition-all hover:bg-purple-500 sm:px-4 sm:text-sm"
+              >
+                Sign Up
+              </Link>
+
               <Link
                 href="/dashboard"
-                className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs sm:text-sm transition-all shadow-md shadow-purple-600/30 flex items-center gap-1.5"
+                className="hidden rounded-xl bg-slate-800 px-3 py-2 text-xs font-semibold text-white transition-all hover:bg-slate-700 sm:px-4 sm:text-sm md:inline-flex"
               >
                 Dashboard
               </Link>
@@ -75,12 +88,10 @@ export default function RootLayout({
           </div>
         </header>
 
-        {/* Main Content Area */}
         <main className="flex-1">{children}</main>
 
-        {/* Global Footer */}
         <footer className="border-t border-white/10 bg-slate-950 py-8 text-xs text-slate-500">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-4 px-4 sm:flex-row sm:px-6 lg:px-8">
             <p>© 2026 CreatorPilot AI. Engineered for YouTube creators.</p>
 
             <div className="flex gap-6">
@@ -94,15 +105,15 @@ export default function RootLayout({
 
               <Link
                 href="/admin"
-                className="hover:text-slate-300 flex items-center gap-1"
+                className="flex items-center gap-1 hover:text-slate-300"
               >
-                <Shield className="w-3 h-3 text-red-400" /> Admin
+                <Shield className="h-3 w-3 text-red-400" />
+                Admin
               </Link>
             </div>
           </div>
         </footer>
 
-        {/* Whop Tracking */}
         <Script
           id="whop-tracking"
           strategy="afterInteractive"

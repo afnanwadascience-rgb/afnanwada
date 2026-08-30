@@ -81,10 +81,16 @@ export async function POST(request: Request) {
       },
       { status: 201 },
     );
-  } catch {
-    return NextResponse.json(
-      { error: "Unable to create your account. Please try again." },
-      { status: 500 },
-    );
-  }
+  } catch (error) {
+  console.error("SIGNUP ERROR:", error);
+  return NextResponse.json(
+    {
+      error:
+        error instanceof Error
+          ? error.message
+          : "Unable to create your account. Please try again.",
+    },
+    { status: 500 },
+  );
+}
 }

@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { Plan, Role } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
+
 export const dynamic = "force-dynamic";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -16,12 +17,38 @@ type SignupBody = {
 
 export async function POST(request: Request) {
   try {
+    // Safe production database diagnostic.
+    // Only logs the hostname — never the password or full DATABASE_URL.
+    const databaseUrl = process.env.DATABASE_URL;
+
+    if (!databaseUrl) {
+      console.error("SIGNUP DATABASE ERROR: DATABASE_URL is missing");
+      return NextResponse.json(
+        { error: "Database configuration is missing." },
+        { status: 500 },
+      );
+    }
+
+    try {
+      const databaseHost = new URL(databaseUrl).hostname;
+      console.log("SIGNUP DATABASE HOST:", databaseHost);
+    } catch {
+      console.error("SIGNUP DATABASE ERROR: DATABASE_URL is malformed");
+      return NextResponse.json(
+        { error: "Database configuration is invalid." },
+        { status: 500 },
+      );
+    }
+
     const body = (await request.json()) as SignupBody;
 
     const name = typeof body.name === "string" ? body.name.trim() : "";
     const email =
-      typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
-    const password = typeof body.password === "string" ? body.password : "";
+      typeof body.email === "string"
+        ? body.email.trim().toLowerCase()
+        : "";
+    const password =
+      typeof body.password === "string" ? body.password : "";
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -56,7 +83,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
+    const passwordHash = await bcrypt.hash(
+      password,
+      BCRYPT_SALT_ROUNDS,
+    );
 
     const user = await prisma.user.create({
       data: {
@@ -76,21 +106,20 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(
-      {
-        user,
-      },
+      { user },
       { status: 201 },
     );
   } catch (error) {
-  console.error("SIGNUP ERROR:", error);
-  return NextResponse.json(
-    {
-      error:
-        error instanceof Error
-          ? error.message
-          : "Unable to create your account. Please try again.",
-    },
-    { status: 500 },
-  );
-}
+    console.error("SIGNUP ERROR:", error);
+
+    return NextResponse.json(
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unable to create your account. Please try again.",
+      },
+      { status: 500 },
+    );
+  }
 }

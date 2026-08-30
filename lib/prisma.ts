@@ -7,13 +7,15 @@ if (!connectionString) {
   throw new Error("DATABASE_URL is not configured");
 }
 
-// Safe diagnostic: only show the database hostname, never the password.
+let databaseHost = "unknown";
+
 try {
-  const url = new URL(connectionString);
-  console.log("DATABASE HOST:", url.hostname);
+  databaseHost = new URL(connectionString).hostname;
 } catch {
-  console.log("DATABASE_URL is malformed");
+  console.error("DATABASE_URL is malformed");
 }
+
+console.log("DATABASE HOST:", databaseHost);
 
 const adapter = new PrismaPg({ connectionString });
 

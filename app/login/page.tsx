@@ -58,7 +58,7 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/dashboard");
+      router.push("/checkout");
       router.refresh();
     } catch {
       setFormError("Unable to sign in. Please try again.");

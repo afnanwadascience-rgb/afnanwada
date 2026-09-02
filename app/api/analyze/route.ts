@@ -1,3 +1,4 @@
+````ts
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
@@ -20,6 +21,16 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!process.env.GROQ_API_KEY) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "GROQ_API_KEY is not configured.",
+        },
+        { status: 500 }
+      );
+    }
+
     const prompt = `
 You are an elite YouTube strategist.
 
@@ -28,42 +39,54 @@ Analyze the following YouTube script.
 Category:
 ${category}
 
-Return ONLY valid JSON.
+Return ONLY valid JSON using exactly this structure:
 
 {
   "viralScore": 0,
-  "hooks":[
+  "hooks": [
     {
-      "style":"",
-      "text":"",
-      "rationale":""
+      "style": "",
+      "text": "",
+      "rationale": ""
     }
   ],
-  "titles":[
+  "titles": [
     {
-      "title":"",
-      "ctrScore":0,
-      "seoScore":0,
-      "readabilityScore":0
+      "title": "",
+      "ctrScore": 0,
+      "seoScore": 0,
+      "readabilityScore": 0
     }
   ],
-  "thumbnailConcepts":{
-    "textIdeas":[],
-    "concept":"",
-    "colorPalette":[],
-    "emotionalFocus":""
+  "thumbnailConcepts": {
+    "textIdeas": [],
+    "concept": "",
+    "colorPalette": [],
+    "emotionalFocus": ""
   },
-  "retentionAnalysis":{
-    "slowIntros":[],
-    "weakTransitions":[],
-    "patternInterrupts":[]
+  "retentionAnalysis": {
+    "slowIntros": [],
+    "weakTransitions": [],
+    "patternInterrupts": []
   },
-  "seoDescription":{
-    "fullText":"",
-    "keywords":[],
-    "hashtags":[]
+  "seoDescription": {
+    "fullText": "",
+    "keywords": [],
+    "hashtags": []
   }
 }
+
+Rules:
+- viralScore must be an integer from 0 to 100.
+- ctrScore must be an integer from 0 to 100.
+- seoScore must be an integer from 0 to 100.
+- readabilityScore must be an integer from 0 to 100.
+- hooks must contain useful, specific alternatives based on the script.
+- titles must be relevant to the actual script.
+- retentionAnalysis must identify specific weaknesses rather than generic advice.
+- Do not use markdown.
+- Do not include explanations outside the JSON object.
+- Return valid JSON only.
 
 SCRIPT:
 
@@ -71,7 +94,7 @@ ${script}
 `;
 
     const completion = await client.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
+      model: "llama-3.1-8b-instant",
       temperature: 0.6,
       response_format: {
         type: "json_object",
@@ -80,7 +103,7 @@ ${script}
         {
           role: "system",
           content:
-            "Return ONLY valid JSON. Never use markdown.",
+            "You are a YouTube script analysis engine. Return ONLY valid JSON.",
         },
         {
           role: "user",
@@ -89,30 +112,43 @@ ${script}
       ],
     });
 
-    let response =
-      completion.choices[0]?.message?.content ?? "";
+    const response = completion.choices[0]?.message?.content;
 
-    response = response
+    if (!response) {
+      throw new Error("Groq returned an empty response.");
+    }
+
+    const cleanedResponse = response
       .replace(/```json/g, "")
       .replace(/```/g, "")
       .trim();
 
-    const parsed = JSON.parse(response);
+    let parsed;
+
+    try {
+      parsed = JSON.parse(cleanedResponse);
+    } catch {
+      console.error("Invalid JSON returned by Groq:", cleanedResponse);
+      throw new Error("The AI returned invalid JSON.");
+    }
 
     return NextResponse.json({
       success: true,
       data: parsed,
     });
-
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Groq Error:", error);
+
+    const message =
+      error instanceof Error ? error.message : "Analysis failed.";
 
     return NextResponse.json(
       {
         success: false,
-        error: error.message ?? "Analysis failed.",
+        error: message,
       },
       { status: 500 }
     );
   }
 }
+````

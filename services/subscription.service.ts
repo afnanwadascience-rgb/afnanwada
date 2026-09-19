@@ -1,9 +1,13 @@
 import { prisma } from '@/lib/prisma';
-import { calculateQuota } from '@/lib/analytics';
+
+const FREE_ANALYSIS_LIMIT = 10;
 
 export class SubscriptionService {
   /**
-   * Calculates current quota and plan tier status for a user.
+   * Calculates the user's current analysis quota.
+   *
+   * FREE users get 10 analyses total.
+   * PRO users have unlimited analyses.
    */
   static async getUserQuotaStatus(userId: string) {
     const user = await prisma.user.findUnique({
@@ -11,19 +15,46 @@ export class SubscriptionService {
       select: { plan: true },
     });
 
-    const isPro = user?.plan === 'PRO';
+    if (!user) {
+      return {
+        hasQuota: false,
+        used: 0,
+        limit: 0,
+        remaining: 0,
+        isPro: false,
+      };
+    }
 
-    const now = new Date();
-    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const isPro = user.plan === 'PRO';
 
-    const monthlyAnalysesCount = await prisma.analysis.count({
+    // PRO users have unlimited analyses.
+    if (isPro) {
+      return {
+        hasQuota: true,
+        used: 0,
+        limit: null,
+        remaining: null,
+        isPro: true,
+      };
+    }
+
+    // Count ALL analyses for the user.
+    // There is no monthly reset and no 1-hour cooldown.
+    const analysisCount = await prisma.analysis.count({
       where: {
         userId,
-        createdAt: { gte: firstDayOfMonth },
       },
     });
 
-    return calculateQuota(monthlyAnalysesCount, isPro);
+    const remaining = Math.max(FREE_ANALYSIS_LIMIT - analysisCount, 0);
+
+    return {
+      hasQuota: analysisCount < FREE_ANALYSIS_LIMIT,
+      used: analysisCount,
+      limit: FREE_ANALYSIS_LIMIT,
+      remaining,
+      isPro: false,
+    };
   }
 
   /**

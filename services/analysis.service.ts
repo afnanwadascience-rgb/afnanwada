@@ -10,8 +10,11 @@ export class AnalysisService {
     // 1. Verify user quota access
     const quota = await SubscriptionService.getUserQuotaStatus(userId);
     if (!quota.hasQuota) {
-      throw new Error('Monthly analysis quota reached. Upgrade to Pro for unlimited analyses.');
-    }
+        throw new Error(
+         'You have used all 10 free analyses. Upgrade to Pro to continue.'
+         );
+
+
 
     // 2. Process AI Evaluation
     const aiResult = await AIService.analyzeScript({ script, category });

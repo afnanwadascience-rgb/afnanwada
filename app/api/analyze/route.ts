@@ -30,10 +30,48 @@ export async function POST(request: Request) {
     const userId = session.user.id;
 
     // --------------------------------------------------
-    // 2. Check user's plan
+    // 2. Read request
+    // --------------------------------------------------
+    const body = await request.json();
+
+    const script =
+      typeof body?.script === "string" ? body.script : "";
+
+    const category =
+      typeof body?.category === "string"
+        ? body.category
+        : "General";
+
+    if (!script.trim()) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Script text is required.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // --------------------------------------------------
+    // 3. Check Groq API key
+    // --------------------------------------------------
+    if (!process.env.GROQ_API_KEY) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "GROQ_API_KEY is not configured.",
+        },
+        { status: 500 }
+      );
+    }
+
+    // --------------------------------------------------
+    // 4. Find user and plan
     // --------------------------------------------------
     const user = await prisma.user.findUnique({
-      where: { id: userId },
+      where: {
+        id: userId,
+      },
       select: {
         plan: true,
       },
@@ -52,7 +90,7 @@ export async function POST(request: Request) {
     const isPro = user.plan === "PRO";
 
     // --------------------------------------------------
-    // 3. Check FREE user's total analysis limit
+    // 5. Check FREE analysis limit
     // --------------------------------------------------
     if (!isPro) {
       const analysisCount = await prisma.analysis.count({
@@ -70,6 +108,7 @@ export async function POST(request: Request) {
             code: "FREE_ANALYSIS_LIMIT_REACHED",
             used: analysisCount,
             limit: FREE_ANALYSIS_LIMIT,
+            remaining: 0,
           },
           { status: 403 }
         );
@@ -77,45 +116,26 @@ export async function POST(request: Request) {
     }
 
     // --------------------------------------------------
-    // 4. Read request
-    // --------------------------------------------------
-    const { script, category = "General" } = await request.json();
-
-    if (!script?.trim()) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Script text is required.",
-        },
-        { status: 400 }
-      );
-    }
-
-    // --------------------------------------------------
-    // 5. Check Groq API key
-    // --------------------------------------------------
-    if (!process.env.GROQ_API_KEY) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "GROQ_API_KEY is not configured.",
-        },
-        { status: 500 }
-      );
-    }
-
-    // --------------------------------------------------
     // 6. Build AI prompt
     // --------------------------------------------------
     const prompt = `
-You are an elite YouTube strategist.
+You are an expert YouTube script strategist.
 
-Analyze the following YouTube script.
+Analyze the YouTube script below.
 
 Category:
 ${category}
 
-Return ONLY valid JSON using exactly this structure:
+Return ONLY ONE valid JSON object.
+
+Do not use:
+- Markdown
+- Code fences
+- Comments
+- Explanations outside JSON
+- Trailing commas
+
+The JSON must follow EXACTLY this structure:
 
 {
   "viralScore": 0,
@@ -153,16 +173,47 @@ Return ONLY valid JSON using exactly this structure:
 }
 
 Rules:
-- viralScore must be an integer from 0 to 100.
-- ctrScore must be an integer from 0 to 100.
-- seoScore must be an integer from 0 to 100.
-- readabilityScore must be an integer from 0 to 100.
-- hooks must contain useful, specific alternatives based on the script.
-- titles must be relevant to the actual script.
-- retentionAnalysis must identify specific weaknesses rather than generic advice.
-- Do not use markdown.
-- Do not include explanations outside the JSON object.
-- Return valid JSON only.
+
+1. viralScore must be an integer from 0 to 100.
+
+2. hooks must contain useful and specific alternative hooks based on the actual script.
+
+3. Each hook must contain:
+   - style
+   - text
+   - rationale
+
+4. titles must be relevant to the actual script.
+
+5. Each title must contain:
+   - title
+   - ctrScore
+   - seoScore
+   - readabilityScore
+
+6. All scores must be integers from 0 to 100.
+
+7. thumbnailConcepts must contain:
+   - textIdeas as an array of short thumbnail text ideas
+   - concept as a description
+   - colorPalette as an array
+   - emotionalFocus as a short description
+
+8. retentionAnalysis must contain:
+   - slowIntros as an array
+   - weakTransitions as an array
+   - patternInterrupts as an array
+
+9. seoDescription must contain:
+   - fullText
+   - keywords as an array
+   - hashtags as an array
+
+10. Base everything on the actual script.
+
+11. Do not invent unrelated topics.
+
+12. Return valid JSON only.
 
 SCRIPT:
 
@@ -170,19 +221,16 @@ ${script}
 `;
 
     // --------------------------------------------------
-    // 7. Run AI analysis
+    // 7. Call Groq
     // --------------------------------------------------
     const completion = await client.chat.completions.create({
-      model: "openai/gpt-oss-20b",
-      temperature: 0.6,
-      response_format: {
-        type: "json_object",
-      },
+      model: "llama-3.3-70b-versatile",
+      temperature: 0.3,
       messages: [
         {
           role: "system",
           content:
-            "You are a YouTube script analysis engine. Return ONLY valid JSON.",
+            "You are a YouTube script analysis engine. Return exactly one valid JSON object and nothing else.",
         },
         {
           role: "user",
@@ -191,70 +239,162 @@ ${script}
       ],
     });
 
-    const response = completion.choices[0]?.message?.content;
+    const response =
+      completion.choices[0]?.message?.content;
 
     if (!response) {
-      throw new Error("Groq returned an empty response.");
+      throw new Error(
+        "Groq returned an empty response."
+      );
     }
 
+    // --------------------------------------------------
+    // 8. Clean AI response
+    // --------------------------------------------------
     const cleanedResponse = response
-      .replace(/```json/g, "")
-      .replace(/```/g, "")
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/i, "")
+      .replace(/\s*```$/i, "")
       .trim();
 
+    // --------------------------------------------------
+    // 9. Parse JSON
+    // --------------------------------------------------
     let parsed: any;
 
     try {
       parsed = JSON.parse(cleanedResponse);
-    } catch {
-      console.error("Invalid JSON returned by Groq:", cleanedResponse);
-      throw new Error("The AI returned invalid JSON.");
+    } catch (jsonError) {
+      console.error(
+        "Groq returned invalid JSON:"
+      );
+
+      console.error(cleanedResponse);
+
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "The AI returned invalid JSON. Please try again.",
+          code: "INVALID_AI_JSON",
+        },
+        { status: 502 }
+      );
     }
 
     // --------------------------------------------------
-    // 8. Save successful analysis
+    // 10. Basic response validation
     // --------------------------------------------------
-    const savedAnalysis = await prisma.analysis.create({
-      data: {
-        userId,
-        title:
-          parsed.titles?.[0]?.title ||
-          "Untitled Script Analysis",
+    if (
+      typeof parsed !== "object" ||
+      parsed === null
+    ) {
+      throw new Error(
+        "AI returned an invalid analysis object."
+      );
+    }
 
-        category,
+    if (
+      typeof parsed.viralScore !== "number"
+    ) {
+      parsed.viralScore = 0;
+    }
 
-        scriptContent: script,
+    if (!Array.isArray(parsed.hooks)) {
+      parsed.hooks = [];
+    }
 
-        viralScore:
-          typeof parsed.viralScore === "number"
-            ? parsed.viralScore
-            : 0,
+    if (!Array.isArray(parsed.titles)) {
+      parsed.titles = [];
+    }
 
-        hooks: JSON.stringify(
-          parsed.hooks || []
-        ),
+    if (
+      !parsed.thumbnailConcepts ||
+      typeof parsed.thumbnailConcepts !== "object"
+    ) {
+      parsed.thumbnailConcepts = {
+        textIdeas: [],
+        concept: "",
+        colorPalette: [],
+        emotionalFocus: "",
+      };
+    }
 
-        titles: JSON.stringify(
-          parsed.titles || []
-        ),
+    if (
+      !parsed.retentionAnalysis ||
+      typeof parsed.retentionAnalysis !== "object"
+    ) {
+      parsed.retentionAnalysis = {
+        slowIntros: [],
+        weakTransitions: [],
+        patternInterrupts: [],
+      };
+    }
 
-        retentionAlerts: JSON.stringify(
-          parsed.retentionAnalysis || {}
-        ),
-
-        seoDescription:
-          parsed.seoDescription?.fullText ||
-          "",
-      },
-    });
+    if (
+      !parsed.seoDescription ||
+      typeof parsed.seoDescription !== "object"
+    ) {
+      parsed.seoDescription = {
+        fullText: "",
+        keywords: [],
+        hashtags: [],
+      };
+    }
 
     // --------------------------------------------------
-    // 9. Calculate remaining FREE analyses
+    // 11. Save successful analysis
     // --------------------------------------------------
+    const savedAnalysis =
+      await prisma.analysis.create({
+        data: {
+          userId,
+
+          title:
+            parsed.titles?.[0]?.title ||
+            "Untitled Script Analysis",
+
+          category,
+
+          scriptContent: script,
+
+          viralScore:
+            typeof parsed.viralScore === "number"
+              ? Math.max(
+                  0,
+                  Math.min(
+                    100,
+                    Math.round(parsed.viralScore)
+                  )
+                )
+              : 0,
+
+          hooks: JSON.stringify(
+            parsed.hooks || []
+          ),
+
+          titles: JSON.stringify(
+            parsed.titles || []
+          ),
+
+          retentionAlerts: JSON.stringify(
+            parsed.retentionAnalysis || {}
+          ),
+
+          seoDescription:
+            parsed.seoDescription?.fullText ||
+            "",
+        },
+      });
+
+    // --------------------------------------------------
+    // 12. Calculate remaining quota
+    // --------------------------------------------------
+    let used: number | null = null;
     let remaining: number | null = null;
 
     if (!isPro) {
-      const used = await prisma.analysis.count({
+      used = await prisma.analysis.count({
         where: {
           userId,
         },
@@ -267,7 +407,7 @@ ${script}
     }
 
     // --------------------------------------------------
-    // 10. Return result
+    // 13. Return successful result
     // --------------------------------------------------
     return NextResponse.json({
       success: true,
@@ -281,13 +421,18 @@ ${script}
 
       quota: {
         plan: user.plan,
-        used: isPro ? null : FREE_ANALYSIS_LIMIT - (remaining ?? 0),
-        limit: isPro ? null : FREE_ANALYSIS_LIMIT,
+        used,
+        limit: isPro
+          ? null
+          : FREE_ANALYSIS_LIMIT,
         remaining,
       },
     });
   } catch (error: unknown) {
-    console.error("Groq/Analysis Error:", error);
+    console.error(
+      "Groq/Analysis Error:",
+      error
+    );
 
     const message =
       error instanceof Error

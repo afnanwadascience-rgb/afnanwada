@@ -1,6 +1,7 @@
+
+import Script from "next/script";
 import type { Metadata } from "next";
 import Link from "next/link";
-import Script from "next/script";
 import { Sparkles, Shield } from "lucide-react";
 import "./globals.css";
 
@@ -18,6 +19,21 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className="min-h-screen flex flex-col bg-slate-950 text-slate-100">
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-4B3Q19X3CF"
+          strategy="afterInteractive"
+        />
+
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){window.dataLayer.push(arguments);}
+            window.gtag = gtag;
+            gtag('js', new Date());
+            gtag('config', 'G-4B3Q19X3CF');
+          `}
+        </Script>
+
         <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/80 backdrop-blur-xl">
           <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
             <Link
